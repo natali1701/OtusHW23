@@ -1,41 +1,12 @@
 # -*- mode: ruby -*-
-# vim: set ft=ruby :
-
-MACHINES = {
-  :nginx => {
-        :box_name => "centos/7",
-  }
-}
+# vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-
-  MACHINES.each do |boxname, boxconfig|
-
-      config.vm.define boxname do |box|
-
-          box.vm.box = boxconfig[:box_name]
-          box.vm.host_name = boxname.to_s
-
-          box.vm.network "private_network", ip: boxconfig[:ip_addr]
-
-          box.vm.provider :virtualbox do |vb|
-            vb.customize ["modifyvm", :id, "--memory", "200"]
-          end
-          
-          box.vm.provision "shell", inline: <<-SHELL
-            mkdir -p ~root/.ssh; 
-            cp ~vagrant/.ssh/auth* ~root/.ssh
-          SHELL
-
-          case boxname.to_s
-            when "web"
-            box.vm.provision "shell", run: "always", inline: <<-SHELL
-            yum install epel-release -y
-            yum install nginx -y
-            cp -aR /vagrant/nginx.conf /etc/nginx/nginx.conf
-            systemctl start nginx
-          SHELL
-
-      end
-  end
+	config.vm.box = "centos/7"
+        config.vm.box_check_update = false
+		config.vm.provider "virtualbox" do |vb|
+			vb.gui = false
+			vb.memory = "256"
+		end
+  
 end
